@@ -1,11 +1,9 @@
 <template>
-  <v-form>
-    <v-text-field v-model="utente" :rules="requiredRules" label="Utente" required></v-text-field>
-    <v-text-field v-model="password" :rules="requiredRules" label="Password" type="password" required></v-text-field>
-     <v-btn>
-      Login
-    </v-btn>
-    <v-btn @click.prevent="clear">Cancella</v-btn>
+  <v-form @submit.prevent="onSubmit">
+    <v-text-field v-model="utente" id="utente" label="Utente" required></v-text-field>
+    <v-text-field v-model="password" id="password" label="Password" type="password" required></v-text-field>
+     <v-btn type='submit' color="primary">Login</v-btn>
+    <v-btn color="secondary" @click.prevent="clear">Cancella</v-btn>
   </v-form>
 </template>
 
@@ -13,13 +11,23 @@
 export default {
   data: () => ({
     utente: "",
-    password: "",
-    requiredRules: [v => !!v || "Name is required"]
+    password: ""
   }),
   methods: {
     clear() {
       this.utente = "";
       this.password = "";
+    },
+    onSubmit() {
+      const formData = {
+        utente: this.utente,
+        password: this.password
+      }
+      console.log(formData)
+      this.$store.dispatch('login', {
+        utente: formData.utente,
+        password: formData.password
+      })
     }
   }
 };
