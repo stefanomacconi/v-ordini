@@ -37,7 +37,7 @@ export default new Vuex.Store({
             commit('authUser', {
                 token: 'ABCDEF123'
             })
-            router.push('/')
+            router.push('/vistatura')
         },
         logout({ commit }) {
             commit('clearAuthData')
