@@ -4,6 +4,9 @@ import App from './App.vue'
 
 import store from './store'
 import router from './router'
+import axios from 'axios'
+
+axios.defaults.baseURL = 'http://localhost:8080/spweb/rest'
 
 new Vue({
   render: h => h(App),

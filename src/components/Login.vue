@@ -1,5 +1,5 @@
 <template>
-  <v-form @submit.prevent="onSubmit">
+  <v-form @submit.prevent="login">
     <v-text-field v-model="utente" id="utente" label="Utente" required></v-text-field>
     <v-text-field v-model="password" id="password" label="Password" type="password" required></v-text-field>
      <v-btn type='submit' color="primary">Login</v-btn>
@@ -18,7 +18,7 @@ export default {
       this.utente = "";
       this.password = "";
     },
-    onSubmit() {
+    login() {
       const formData = {
         utente: this.utente,
         password: this.password

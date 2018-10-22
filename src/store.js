@@ -9,35 +9,49 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        token: null
+        token: null,
+        utente: null,
+        siglaDitta: null,
+        ditta: null
     },
     mutations: {
         authUser(state, userData) {
             state.token = userData.token
+            state.utente = userData.utente
+            state.siglaDitta = userData.siglaDitta
+            state.ditta = userData.ditta
         },
         clearAuthData(state) {
             state.token = null
+            state.utente = null
+            state.siglaDitta = null
+            state.ditta = null
         }
     },
     actions: {
         login({ commit }, authData) {
-            /* axios.post('todo', {
-                utente: authData.utente,
-                password: authData.password
-            })
-                .then(res => {
-                    console.log(res)
-                    commit('authUser', {
-                        token: res.data.token
-                    })
+            axios.post('/autenticazione', {
+                }, { auth: {
+                    username: authData.utente,
+                    password: authData.password
+                },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'   
+                },
+            }).then(res => {
+                console.log(res)
+                const data = res.data
+                commit('authUser', {
+                    token: data.diTechToken.token,
+                    utente: data.name,
+                    ditta: data.ditta,
+                    siglaDitta: data.siglaDitta
                 })
-                .catch(error => console.log(error)) */
+                router.push('/vistatura')
+            }).catch(error => {
+                console.log("Errore:" + error)
 
-            /* fake, to delete */
-            commit('authUser', {
-                token: 'ABCDEF123'
             })
-            router.push('/vistatura')
         },
         logout({ commit }) {
             commit('clearAuthData')
@@ -47,6 +61,15 @@ export default new Vuex.Store({
     getters: {
         getToken(state) {
             return state.token
+        },
+        getUtente(state) {
+            return state.utente ? state.utente.toUpperCase() : state.utente
+        },
+        getSiglaDitta(state) {
+            return state.siglaDitta
+        },
+        getDitta(state) {
+            return state.ditta
         },
         isAuthenticated(state) {
             return state.token !== null

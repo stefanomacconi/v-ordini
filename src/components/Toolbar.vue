@@ -8,9 +8,18 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="hidden-sm-and-down">
-        <v-btn v-if="auth" to="/vistatura" flat><v-icon left>description</v-icon>Ordini</v-btn>
-        <v-btn v-if="!auth" to="/login" flat><v-icon left>person</v-icon>Login</v-btn>
-        <v-btn v-if="auth" @click="logout" flat><v-icon left>lock</v-icon>Logout</v-btn>
+        <v-btn v-if="auth" :to="menuOrdini.to" flat>
+          <v-icon left>{{ menuOrdini.icon }}</v-icon>
+          {{ menuOrdini.title }}
+        </v-btn>
+        <v-btn v-if="!auth" :to="menuLogin.to" flat>
+          <v-icon left>{{ menuLogin.icon }}</v-icon>
+          {{ menuLogin.title }}
+        </v-btn>
+        <v-btn v-if="auth" @click="logout" flat>
+          <v-icon left>{{ menuLogout.icon }}</v-icon>
+          {{ menuLogout.title }}
+        </v-btn>
         <v-divider dark vertical></v-divider>
       </v-toolbar-items>
         <v-menu right bottom v-if="auth" origin="bottom right" transition="v-scale-transition">
@@ -18,20 +27,12 @@
             <v-icon>more_vert</v-icon>
           </v-btn>
           <v-list dense class="pt-0">
-            <v-list-tile to="/documento">
+            <v-list-tile v-for="menu in menus" :key="menu.title" :to="menu.to">
               <v-list-tile-action>
-                <v-icon>book</v-icon>
+                <v-icon>{{ menu.icon }}</v-icon>
               </v-list-tile-action>
               <v-list-tile-content>
-                <v-list-tile-title>Tipo Documento</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile to="/conferma">
-              <v-list-tile-action>
-                <v-icon>done_all</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>Conferma d'Ordine</v-list-tile-title>
+                <v-list-tile-title>{{ menu.title }}</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
             </v-list>
@@ -42,44 +43,36 @@
       <v-list>
         <v-list-tile>
           <v-list-tile-title class="title">
-            Utente TODO
+            {{ utente + " - Ditta: " + siglaDitta }}
           </v-list-tile-title>
         </v-list-tile>
       </v-list>
       </v-toolbar>
       <v-divider></v-divider>
       <v-list dense class="pt-0">
-        <v-list-tile to="/vistatura">
+        <v-list-tile :to="menuOrdini.to">
           <v-list-tile-action>
-            <v-icon>description</v-icon>
+            <v-icon>{{ menuOrdini.icon }}</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Vistatura Ordini</v-list-tile-title>
+            <v-list-tile-title>{{ menuOrdini.title }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile to="/documento">
+        <v-list-tile v-for="menu in menus" :key="menu.title" :to="menu.to">
           <v-list-tile-action>
-            <v-icon>book</v-icon>
+            <v-icon>{{ menu.icon }}</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Tipo Documento</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile to="/conferma">
-          <v-list-tile-action>
-            <v-icon>done_all</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Conferma d'Ordine</v-list-tile-title>
+            <v-list-tile-title>{{ menu.title }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-divider dark></v-divider>
         <v-list-tile @click="logout">
           <v-list-tile-action>
-            <v-icon>lock</v-icon>
+            <v-icon>{{ menuLogout.icon }}</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Logout</v-list-tile-title>
+            <v-list-tile-title>{{ menuLogout.title }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -90,11 +83,24 @@
 <script>
 export default {
   data: () => ({
-    drawer: false
+    drawer: false,
+    menus: [
+      {title: "Conferma d'Ordine", to: "/conferma", icon: "done_all"},
+      {title: "Tipo Documento", to: "/documento", icon: "book"}
+    ],
+    menuOrdini : {title: "Vistatura Ordini", to: "/vistatura", icon: "description"},
+    menuLogin : {title: "Login", to: "/login", icon: "person"},
+    menuLogout : {title: "Logout", icon: "lock"},
   }),
   computed: {
     auth () {
       return this.$store.getters.isAuthenticated
+    },
+    utente () {
+      return this.$store.getters.getUtente
+    },
+    siglaDitta () {
+      return this.$store.getters.getSiglaDitta
     }
   },
   methods: {
