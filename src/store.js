@@ -29,7 +29,7 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        login({ commit }, authData) {
+        login({ commit, dispatch }, authData) {
             axios.post('/autenticazione', {
                 }, { auth: {
                     username: authData.utente,
@@ -39,6 +39,7 @@ export default new Vuex.Store({
                     'Content-Type': 'application/x-www-form-urlencoded'   
                 },
             }).then(res => {
+                // eslint-disable-next-line
                 console.log(res)
                 const data = res.data
                 commit('authUser', {
@@ -49,13 +50,31 @@ export default new Vuex.Store({
                 })
                 router.push('/vistatura')
             }).catch(error => {
-                console.log("Errore:" + error)
-
+                // eslint-disable-next-line
+                console.log(error)
+                dispatch('handleError', error.response.data)
             })
         },
         logout({ commit }) {
             commit('clearAuthData')
             router.replace('/login')
+        },
+        // eslint-disable-next-line
+        handleError({}, error) {
+            const errorData = {
+                message : error.message,
+                developerMessage : error.developerMessage,
+                code : error.code,
+                status : error.status,
+            }
+            // eslint-disable-next-line
+            console.log(errorData)
+            router.push({ name: 'error', params: {
+                message : errorData.message,
+                developerMessage : errorData.developerMessage,
+                code : errorData.code,
+                status : errorData.status, 
+            }})
         }
     },
     getters: {

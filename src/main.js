@@ -11,5 +11,10 @@ axios.defaults.baseURL = 'http://localhost:8080/spweb/rest'
 new Vue({
   render: h => h(App),
   router,
-  store
+  store,
+  methods: {
+    globalMethod() {
+      alert("Global Method Called")
+    }
+  }
 }).$mount('#app')

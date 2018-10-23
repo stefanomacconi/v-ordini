@@ -2,6 +2,7 @@ import Login from './components/Login'
 import Ordini from './components/Ordini'
 import Conferma from './components/Conferma'
 import Documento from './components/Documento'
+import Error from './components/Error'
 
 import store from './store'
 
@@ -44,5 +45,6 @@ export const routes = [
                 next('/login')
             }
         }
-    }
+    },
+    {path: "/error", name:"error", component: Error,  props: true}  
 ]

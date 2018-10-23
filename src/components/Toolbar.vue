@@ -22,17 +22,25 @@
         </v-btn>
         <v-divider dark vertical></v-divider>
       </v-toolbar-items>
-        <v-menu right bottom v-if="auth" origin="bottom right" transition="v-scale-transition">
+        <v-menu right bottom origin="bottom right" transition="v-scale-transition">
           <v-btn dark icon slot="activator">
             <v-icon>more_vert</v-icon>
           </v-btn>
           <v-list dense class="pt-0">
-            <v-list-tile v-for="menu in menus" :key="menu.title" :to="menu.to">
+            <v-list-tile v-if="auth" v-for="menu in menus" :key="menu.title" :to="menu.to">
               <v-list-tile-action>
                 <v-icon>{{ menu.icon }}</v-icon>
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>{{ menu.title }}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile v-if="!auth" :to="menuLogin.to">
+              <v-list-tile-action>
+                <v-icon>{{ menuLogin.icon }}</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{ menuLogin.title }}</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
             </v-list>
