@@ -11,10 +11,10 @@
                     @change="changeTipoDocumento"
                 >
                    <template slot="selection" slot-scope="{item}">
-                        {{ item.codice }} - {{ item.descrizione }}
+                        {{ item.codice }} &nbsp; {{ item.descrizione }}
                     </template>
                     <template slot="item" slot-scope="{item}">
-                        {{ item.codice }} - {{ item.descrizione }}
+                        {{ item.codice }} &nbsp; {{ item.descrizione }}
                     </template>
                 </v-select>
             </v-flex>
@@ -37,7 +37,8 @@ export default {
     },
     methods: {
         changeTipoDocumento() {
-             this.$store.dispatch('setTipoDocumento', this.tipoDocumentoScelto)
+            this.$store.dispatch('setTipoDocumento', this.tipoDocumentoScelto)
+            this.$store.dispatch('fetchOrdiniDaVistare')
         }
     }
 }

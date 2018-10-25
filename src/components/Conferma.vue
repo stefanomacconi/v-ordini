@@ -11,10 +11,10 @@
                     @change="changeConfermaOrdine"
                 >
                    <template slot="selection" slot-scope="{item}">
-                        {{ item.codice }} - {{ item.descrizione }}
+                        {{ item.codice }} &nbsp; {{ item.descrizione }}
                     </template>
                     <template slot="item" slot-scope="{item}">
-                        {{ item.codice }} - {{ item.descrizione }}
+                        {{ item.codice }} &nbsp; {{ item.descrizione }}
                     </template>
                 </v-select>
             </v-flex>
@@ -37,7 +37,8 @@ export default {
     },
     methods: {
         changeConfermaOrdine() {
-             this.$store.dispatch('setConfermaOrdine', this.confermaOrdineScelta)
+            this.$store.dispatch('setConfermaOrdine', this.confermaOrdineScelta)
+            this.$store.dispatch('fetchOrdiniDaVistare')
         }
     }
 }
