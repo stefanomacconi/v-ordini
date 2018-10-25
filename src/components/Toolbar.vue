@@ -47,7 +47,8 @@
         </v-menu> 
     </v-toolbar>
     <v-navigation-drawer v-model="drawer" temporary app>
-      <v-toolbar dark color='primary' flat>
+      <!-- <v-toolbar dark color='primary' flat> -->
+      <v-toolbar flat>
       <v-list>
         <v-list-tile>
           <v-list-tile-title class="title">
@@ -97,7 +98,7 @@ export default {
       {title: "Tipo Documento", to: "/documento", icon: "book"}
     ],
     menuOrdini : {title: "Vistatura Ordini", to: "/vistatura", icon: "description"},
-    menuLogin : {title: "Login", to: "/login", icon: "person"},
+    menuLogin : {title: "Sign In", to: "/login", icon: "person"},
     menuLogout : {title: "Logout", icon: "lock"},
   }),
   computed: {

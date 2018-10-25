@@ -9,7 +9,7 @@
         </v-container>
         <v-expansion-panel>
             <v-expansion-panel-content>
-            <div slot="header">Dettagli sull'errore</div>
+            <div slot="header">Dettagli aggiuntivi</div>
             <v-card>
                 <v-card-text>{{ message }}</v-card-text>
             </v-card>
@@ -20,7 +20,23 @@
 
 <script>
 export default {
-    props: ['message', 'developerMessage', 'status', 'code']
+    props: {
+        message: {
+            type: String
+        },
+        developerMessage: {
+            type: String,
+            default: "Risorsa non trovata"
+        },
+        code: {
+            type: Number,
+            default: 404
+        },
+        status: {
+            type: String,
+            default: "Not Found"
+        }
+    }
 }
 </script>
 

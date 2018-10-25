@@ -12,7 +12,11 @@ export default new Vuex.Store({
         token: null,
         utente: null,
         siglaDitta: null,
-        ditta: null
+        ditta: null,
+        tipiDocumento: [],
+        tipoDocumento: null,
+        confermeOrdine: [],
+        confermaOrdine: null
     },
     mutations: {
         authUser(state, userData) {
@@ -26,10 +30,22 @@ export default new Vuex.Store({
             state.utente = null
             state.siglaDitta = null
             state.ditta = null
+        },
+        setTipoDocumento(state, tipoDocumento) {
+            state.tipoDocumento = tipoDocumento
+        },
+        setTipiDocumento(state, tipiDocumento) {
+            state.tipiDocumento = tipiDocumento
+        },
+        setConfermaOrdine(state, confermaOrdine) {
+            state.confermaOrdine = confermaOrdine
+        },
+        setConfermeOrdine(state, confermeOrdine) {
+            state.confermeOrdine = confermeOrdine
         }
     },
     actions: {
-        login({ commit, dispatch }, authData) {
+        login({ commit, dispatch}, authData) {
             axios.post('/autenticazione', {
                 }, { auth: {
                     username: authData.utente,
@@ -48,6 +64,7 @@ export default new Vuex.Store({
                     ditta: data.ditta,
                     siglaDitta: data.siglaDitta
                 })
+                dispatch('initEnvironment')
                 router.push('/vistatura')
             }).catch(error => {
                 // eslint-disable-next-line
@@ -75,6 +92,63 @@ export default new Vuex.Store({
                 code : errorData.code,
                 status : errorData.status, 
             }})
+        },
+        initEnvironment({ state, dispatch }) {
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + state.token;
+            dispatch('fetchTipiDocumento')
+            dispatch('fetchConfermeOrdine')
+            // TODO
+            // riempi ordini da vistare
+        },
+        fetchTipiDocumento({ dispatch }) {
+            axios.get('/tipo-documento/ordini')
+            .then(res => {
+                // eslint-disable-next-line
+                console.log(res)
+                // clean the result 
+                const tipiDocumentoData = res.data
+                const listaTipiDocumento = []
+                if (tipiDocumentoData) {
+                    tipiDocumentoData.forEach(tipoDoc => {
+                        var tipo = {
+                            codice: tipoDoc.codice,
+                            descrizione: tipoDoc.descrizione
+                        }
+                        listaTipiDocumento.push(tipo)
+                    });
+                }
+                dispatch('setTipiDocumento', listaTipiDocumento)
+                dispatch('setTipoDocumento', listaTipiDocumento[0])
+            }).catch(error => {
+                // eslint-disable-next-line
+                console.log(error)
+                dispatch('handleError', error.response.data)
+            })
+        },
+        fetchConfermeOrdine({ dispatch }) {
+            axios.get('/conferma-ordine')
+            .then(res => {
+                // eslint-disable-next-line
+                console.log(res)
+                dispatch('setConfermeOrdine', res.data)
+                dispatch('setConfermaOrdine', res.data[0])
+            }).catch(error => {
+                // eslint-disable-next-line
+                console.log(error)
+                dispatch('handleError', error.response.data)
+            })
+        },
+        setTipoDocumento({ commit }, tipoDocumento) {
+            commit('setTipoDocumento', tipoDocumento)
+        },
+        setTipiDocumento({ commit }, tipiDocumentoData) {
+            commit('setTipiDocumento', tipiDocumentoData)
+        },
+        setConfermaOrdine({ commit }, confermaOrdine) {
+            commit('setConfermaOrdine', confermaOrdine)
+        },
+        setConfermeOrdine({ commit }, confermeOrdine) {
+            commit('setConfermeOrdine', confermeOrdine)
         }
     },
     getters: {
@@ -89,6 +163,18 @@ export default new Vuex.Store({
         },
         getDitta(state) {
             return state.ditta
+        },
+        getTipiDocumento(state) {
+            return state.tipiDocumento
+        },
+        getTipoDocumento(state) {
+            return state.tipoDocumento
+        },
+        getConfermaOrdine(state) {
+            return state.confermaOrdine
+        },
+        getConfermeOrdine(state) {
+            return state.confermeOrdine
         },
         isAuthenticated(state) {
             return state.token !== null
