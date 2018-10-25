@@ -9,12 +9,14 @@
 <script>
 export default {
     computed: {
+        tipoDocumento() {
+            return this.$store.getters.getTipoDocumento
+        },
+        confermaOrdine() {
+            return this.$store.getters.getConfermaOrdine
+        },
         ordini() {
-            const tipoDocumento = this.$store.getters.getTipoDocumento
-            const confermaOrdine = this.$store.getters.getConfermaOrdine
-            if (tipoDocumento !== null && confermaOrdine !== null) {
-                this.$store.dispatch('fetchOrdiniDaVistare')
-                return this.$store.getters.getOrdini            }
+            return this.$store.getters.getOrdini            
         }
     }
 }

@@ -148,7 +148,7 @@ export default new Vuex.Store({
                 dispatch('handleError', error.response.data)
             })
         },
-        fetchOrdiniDaVistare({ commit, dispatch, state }) {
+        async fetchOrdiniDaVistare({ commit, dispatch, state }) {
             axios.get('/ordine/fornitore/da-vistare/' 
                 + state.tipoDocumento.codice
                 + "/" 
