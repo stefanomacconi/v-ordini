@@ -56,7 +56,7 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        login({ commit, dispatch}, authData) {
+        login({ commit, dispatch, state}, authData) {
             axios.post('/autenticazione', {
                 }, { auth: {
                     username: authData.utente,
@@ -75,8 +75,13 @@ export default new Vuex.Store({
                     ditta: data.ditta,
                     siglaDitta: data.siglaDitta
                 })
-                dispatch('initEnvironment')
-                router.push('/vistatura')
+                // init environment
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + state.token;
+                return dispatch('fetchTipiDocumento').then(() => {
+                    dispatch('fetchConfermeOrdine').then(() => {
+                        dispatch('fetchOrdiniDaVistare')
+                    })
+                })
             }).catch(error => {
                 // eslint-disable-next-line
                 console.log(error)
@@ -105,47 +110,52 @@ export default new Vuex.Store({
                 status : errorData.status, 
             }})
         },
-        initEnvironment({ state, dispatch }) {
-            axios.defaults.headers.common['Authorization'] = 'Bearer ' + state.token;
-            dispatch('fetchTipiDocumento')
-            dispatch('fetchConfermeOrdine')
-        },
         fetchTipiDocumento({ commit, dispatch }) {
-            axios.get('/tipo-documento/ordini')
-            .then(res => {
-                // eslint-disable-next-line
-                console.log(res)
-                // clean the result 
-                const tipiDocumentoData = res.data
-                const listaTipiDocumento = []
-                if (tipiDocumentoData) {
-                    tipiDocumentoData.forEach(tipoDoc => {
-                        var tipo = {
-                            codice: tipoDoc.codice,
-                            descrizione: tipoDoc.descrizione
-                        }
-                        listaTipiDocumento.push(tipo)
-                    });
-                }
-                commit('setTipiDocumento', listaTipiDocumento)
-                dispatch('setTipoDocumento', listaTipiDocumento[0])
-            }).catch(error => {
-                // eslint-disable-next-line
-                console.log(error)
-                dispatch('handleError', error.response.data)
+            return new Promise((resolve, reject) => {
+                axios.get('/tipo-documento/ordini')
+                .then(res => {
+                    // eslint-disable-next-line
+                    console.log(res)
+                    // clean the result 
+                    const tipiDocumentoData = res.data
+                    const listaTipiDocumento = []
+                    if (tipiDocumentoData) {
+                        tipiDocumentoData.forEach(tipoDoc => {
+                            var tipo = {
+                                codice: tipoDoc.codice,
+                                descrizione: tipoDoc.descrizione
+                            }
+                            listaTipiDocumento.push(tipo)
+                        });
+                    }
+                    commit('setTipiDocumento', listaTipiDocumento)
+                    dispatch('setTipoDocumento', listaTipiDocumento[0])
+                    resolve()
+                }).catch(error => {
+                    // eslint-disable-next-line
+                    console.log(error)
+                    dispatch('handleError', error.response.data)
+                    reject()
+                })
+            
             })
+
         },
         fetchConfermeOrdine({ commit, dispatch }) {
-            axios.get('/conferma-ordine')
-            .then(res => {
-                // eslint-disable-next-line
-                console.log(res)
-                commit('setConfermeOrdine', res.data)
-                dispatch('setConfermaOrdine', res.data[0])
-            }).catch(error => {
-                // eslint-disable-next-line
-                console.log(error)
-                dispatch('handleError', error.response.data)
+            return new Promise((resolve, reject) => {
+                axios.get('/conferma-ordine')
+                .then(res => {
+                    // eslint-disable-next-line
+                    console.log(res)
+                    commit('setConfermeOrdine', res.data)
+                    dispatch('setConfermaOrdine', res.data[0])
+                    resolve()
+                }).catch(error => {
+                    // eslint-disable-next-line
+                    console.log(error)
+                    dispatch('handleError', error.response.data)
+                    reject()
+                })
             })
         },
         async fetchOrdiniDaVistare({ commit, dispatch, state }) {
@@ -157,6 +167,7 @@ export default new Vuex.Store({
                 // eslint-disable-next-line
                 console.log(res)
                 commit('setOrdini', res.data)
+                router.push('/vistatura')
             }).catch(error => {
                 // eslint-disable-next-line
                 console.log(error)
