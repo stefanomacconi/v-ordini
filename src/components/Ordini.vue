@@ -10,7 +10,7 @@
                 Conferma d'Ordine : {{ confermaOrdine.codice }} {{ confermaOrdine.descrizione }}
             </div>
             <v-spacer></v-spacer>
-            <v-btn icon>
+            <v-btn icon @click="vistaOrdini()">
                 <v-icon>check_circle</v-icon>
             </v-btn>
             <v-divider light vertical></v-divider>
@@ -94,7 +94,7 @@ export default {
             }
         },
         print() {
-            if (this.ordini.length == 0)
+            if (this.ordiniSelezionati.length == 0)
                 return
             const ordineDaStampare = this.ordiniSelezionati[0]
             axios({
@@ -106,7 +106,6 @@ export default {
                         'Content-Type': 'application/json'
                     }
                 }).then(res => {
-                // eslint-disable-next-line
                 const url = window.URL.createObjectURL(new Blob([res.data]));
                 const link = document.createElement('a');
                 link.href = url;
@@ -118,6 +117,26 @@ export default {
                 console.log(error)
                 this.$store.dispatch('handleError', error.response.data)
             })
+        },
+        vistaOrdini() {
+            if (this.ordiniSelezionati.length == 0)
+                return
+            axios({
+                method: 'post',
+                url: '/ordine/fornitore/vista',
+                data: this.ordiniSelezionati, 
+                headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(res => {
+                // eslint-disable-next-line
+                console.log(res.data)
+            }).catch(error => {
+                // eslint-disable-next-line
+                console.log(error)
+                this.$store.dispatch('handleError', error.response.data)
+            })
+            
         }
     }
 }
