@@ -3,6 +3,7 @@ import Ordini from './components/Ordini'
 import Conferma from './components/Conferma'
 import Documento from './components/Documento'
 import Error from './components/Error'
+import Result from './components/Result'
 
 import store from './store'
 
@@ -13,7 +14,9 @@ export const routes = [
         component: Ordini,
         beforeEnter(to, from, next) {
             if (store.getters.getToken) {
-                next()
+                store.dispatch('fetchOrdiniDaVistare').then(() => {
+                    next()
+                })
             } else {
                 next('/login')
             }
@@ -39,6 +42,15 @@ export const routes = [
     },
     {
         path: '/documento', component: Documento, beforeEnter(to, from, next) {
+            if (store.getters.getToken) {
+                next()
+            } else {
+                next('/login')
+            }
+        }
+    },
+    {
+        path: '/result', name:"result", component: Result, props: true, beforeEnter(to, from, next) {
             if (store.getters.getToken) {
                 next()
             } else {

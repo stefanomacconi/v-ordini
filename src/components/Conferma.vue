@@ -38,7 +38,7 @@ export default {
     methods: {
         changeConfermaOrdine() {
             this.$store.dispatch('setConfermaOrdine', this.confermaOrdineScelta)
-            this.$store.dispatch('fetchOrdiniDaVistare')
+            this.$router.push('/vistatura')
         }
     }
 }

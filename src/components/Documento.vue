@@ -38,7 +38,7 @@ export default {
     methods: {
         changeTipoDocumento() {
             this.$store.dispatch('setTipoDocumento', this.tipoDocumentoScelto)
-            this.$store.dispatch('fetchOrdiniDaVistare')
+            this.$router.push('/vistatura')
         }
     }
 }

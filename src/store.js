@@ -79,7 +79,7 @@ export default new Vuex.Store({
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + state.token;
                 return dispatch('fetchTipiDocumento').then(() => {
                     dispatch('fetchConfermeOrdine').then(() => {
-                        dispatch('fetchOrdiniDaVistare')
+                        router.push('/vistatura')
                     })
                 })
             }).catch(error => {
@@ -159,19 +159,22 @@ export default new Vuex.Store({
             })
         },
         async fetchOrdiniDaVistare({ commit, dispatch, state }) {
-            axios.get('/ordine/fornitore/da-vistare/' 
-                + state.tipoDocumento.codice
-                + "/" 
-                + state.confermaOrdine.codice)
-            .then(res => {
-                // eslint-disable-next-line
-                console.log(res)
-                commit('setOrdini', res.data)
-                router.push('/vistatura')
-            }).catch(error => {
-                // eslint-disable-next-line
-                console.log(error)
-                dispatch('handleError', error.response.data)
+            return new Promise((resolve, reject) => {
+                axios.get('/ordine/fornitore/da-vistare/' 
+                    + state.tipoDocumento.codice
+                    + "/" 
+                    + state.confermaOrdine.codice)
+                .then(res => {
+                    // eslint-disable-next-line
+                    console.log(res)
+                    commit('setOrdini', res.data)
+                    resolve()
+                }).catch(error => {
+                    // eslint-disable-next-line
+                    console.log(error)
+                    dispatch('handleError', error.response.data)
+                    reject()
+                })
             })
         },
         setTipoDocumento({ commit }, tipoDocumento) {

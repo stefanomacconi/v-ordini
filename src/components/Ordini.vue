@@ -1,16 +1,34 @@
 <template>
-  <v-layout row>
+  <v-layout>
     <v-flex>
-      <v-card>
+        <v-layout row wrap>
+                <v-flex xs6 class="grey lighten-3">
+                    <v-list-tile color="grey darken-1" avatar v-if="tipoDocumento.codice" @click="goToDocumento()">
+                        <v-list-tile-content class="text-xs-center">
+                            <v-list-tile-title class="text-xs-center">TIPO DOCUMENTO</v-list-tile-title>
+                            <v-list-tile-sub-title>
+                                {{ tipoDocumento.codice }} {{ tipoDocumento.descrizione }}
+                            </v-list-tile-sub-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                </v-flex>
+                <v-flex xs6 class="grey lighten-3">
+                    <v-list-tile color="grey darken-1" avatar v-if="confermaOrdine.codice" @click="goToConferma()">
+                        <v-list-tile-content class="text-xs-center">
+                            <v-list-tile-title class="text-xs-center">CONFERMA D'ORDINE</v-list-tile-title>
+                            <v-list-tile-sub-title>
+                                {{ confermaOrdine.codice }} {{ confermaOrdine.descrizione }}
+                            </v-list-tile-sub-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                </v-flex>
+        </v-layout>
+        <br>
+      <v-card v-if="this.ordini.length > 0">
         <v-toolbar card>
             <v-toolbar-title>Ordini da vistare</v-toolbar-title>
-            <div slot="extension">
-                Tipo Documento : {{ tipoDocumento.codice }} {{ tipoDocumento.descrizione }}
-                <br>
-                Conferma d'Ordine : {{ confermaOrdine.codice }} {{ confermaOrdine.descrizione }}
-            </div>
             <v-spacer></v-spacer>
-            <v-btn icon @click="vistaOrdini()">
+            <v-btn icon @click="confermaVistaOrdini()">
                 <v-icon>check_circle</v-icon>
             </v-btn>
             <v-divider light vertical></v-divider>
@@ -41,7 +59,34 @@
           </template>
         </v-list>
       </v-card>
+      <v-alert type="success" :value="this.ordini.length == 0" icon="check_circle">
+        NESSUN ORDINE DA VISTARE
+      </v-alert>
     </v-flex>
+    <v-dialog v-model="dialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Confermare la vistatura?</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="error" @click="dialog = false" >
+            Annulla
+          </v-btn>
+          <v-btn color="success" @click="vistaOrdini()">
+            Conferma
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <div class="text-xs-center">
+      <v-dialog v-model="dialogLoading" persistent width="300" >
+        <v-card color="primary" dark>
+          <v-card-text>
+            Attendere...
+            <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </div>
   </v-layout>
 </template>
 
@@ -52,7 +97,9 @@ export default {
     data () {
         return {
             indiciSelezionati: [],
-            ordiniSelezionati: []
+            ordiniSelezionati: [],
+            dialog: false,
+            dialogLoading: false
         }
     },
     computed: {
@@ -96,6 +143,7 @@ export default {
         print() {
             if (this.ordiniSelezionati.length == 0)
                 return
+            this.dialogLoading = true
             const ordineDaStampare = this.ordiniSelezionati[0]
             axios({
                 method: 'post',
@@ -112,15 +160,21 @@ export default {
                 link.setAttribute('download', 'ordine_' + ordineDaStampare.key + '.pdf');
                 document.body.appendChild(link);
                 link.click();
+                this.dialogLoading = false
             }).catch(error => {
                 // eslint-disable-next-line
                 console.log(error)
                 this.$store.dispatch('handleError', error.response.data)
             })
         },
-        vistaOrdini() {
+        confermaVistaOrdini() {
             if (this.ordiniSelezionati.length == 0)
                 return
+            this.dialog = true
+        },
+        vistaOrdini() {
+            this.dialog = false
+            this.dialogLoading = true
             axios({
                 method: 'post',
                 url: '/ordine/fornitore/vista',
@@ -129,14 +183,28 @@ export default {
                         'Content-Type': 'application/json'
                     }
                 }).then(res => {
+                    const ordiniData = {
+                        vistati : res.data.vistati,
+                        nonVistati : res.data.nonVistati
+                    }
                 // eslint-disable-next-line
-                console.log(res.data)
+                console.log(ordiniData)
+                this.$router.push({ name: 'result', params: {
+                    vistati : ordiniData.vistati,
+                    nonVistati : ordiniData.nonVistati
+            }})
             }).catch(error => {
                 // eslint-disable-next-line
                 console.log(error)
                 this.$store.dispatch('handleError', error.response.data)
             })
             
+        },
+        goToDocumento() {
+            this.$router.push('/documento')
+        },
+        goToConferma() {
+            this.$router.push('/conferma')
         }
     }
 }
