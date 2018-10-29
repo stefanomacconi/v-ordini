@@ -16,6 +16,11 @@ export const routes = [
             if (store.getters.getToken) {
                 store.dispatch('fetchOrdiniDaVistare').then(() => {
                     next()
+                }).catch(() => {
+                    store.dispatch('handleError', {
+                        developerMessage: "Impossibile recuperare gli ordini da vistare, "+ 
+                             + "controllare la connessione al server."
+                    }) 
                 })
             } else {
                 next('/login')
