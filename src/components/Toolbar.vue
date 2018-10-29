@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar color='primary' dark fixed app clipped-right>
+    <v-toolbar color='primary' dark scroll-off-screen app clipped-right>
       <v-toolbar-side-icon @click.stop="drawer = !drawer" :disabled="!auth"></v-toolbar-side-icon>
       <v-toolbar-title>
         V-Ordini

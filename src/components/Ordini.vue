@@ -2,22 +2,28 @@
   <v-layout>
     <v-flex>
         <v-layout row wrap>
-                <v-flex xs6 class="grey lighten-3">
-                    <v-list-tile color="grey darken-1" avatar v-if="tipoDocumento.codice" @click="goToDocumento()">
+                <v-flex xs6 class="grey lighten-3 rounded">
+                    <v-list-tile avatar @click="goToDocumento()">
                         <v-list-tile-content class="text-xs-center">
                             <v-list-tile-title class="text-xs-center">TIPO DOCUMENTO</v-list-tile-title>
-                            <v-list-tile-sub-title>
+                            <v-list-tile-sub-title v-if="tipoDocumento.codice">
                                 {{ tipoDocumento.codice }} {{ tipoDocumento.descrizione }}
+                            </v-list-tile-sub-title>
+                            <v-list-tile-sub-title v-else>
+                                &nbsp;     
                             </v-list-tile-sub-title>
                         </v-list-tile-content>
                     </v-list-tile>
                 </v-flex>
-                <v-flex xs6 class="grey lighten-3">
-                    <v-list-tile color="grey darken-1" avatar v-if="confermaOrdine.codice" @click="goToConferma()">
+                <v-flex xs6 class="grey lighten-3 rounded">
+                    <v-list-tile avatar @click="goToConferma()">
                         <v-list-tile-content class="text-xs-center">
                             <v-list-tile-title class="text-xs-center">CONFERMA D'ORDINE</v-list-tile-title>
-                            <v-list-tile-sub-title>
+                            <v-list-tile-sub-title v-if="confermaOrdine.codice">
                                 {{ confermaOrdine.codice }} {{ confermaOrdine.descrizione }}
+                            </v-list-tile-sub-title>
+                            <v-list-tile-sub-title v-else>
+                                &nbsp;     
                             </v-list-tile-sub-title>
                         </v-list-tile-content>
                     </v-list-tile>
@@ -26,7 +32,10 @@
         <br>
       <v-card v-if="this.ordini.length > 0">
         <v-toolbar card>
-            <v-toolbar-title>Ordini da vistare</v-toolbar-title>
+            <v-badge>
+                <span slot="badge">{{ this.filteredOrdini.length }}</span>
+                <v-toolbar-title>Ordini da vistare</v-toolbar-title>
+            </v-badge>
             <v-spacer></v-spacer>
             <v-btn icon @click="confermaVistaOrdini()">
                 <v-icon>check_circle</v-icon>
@@ -40,9 +49,14 @@
                 <v-icon v-if="allToggled">check_box</v-icon>
                 <v-icon v-else>check_box_outline_blank</v-icon>
             </v-btn>
+            <v-layout row slot="extension">
+                <v-icon left>search</v-icon>
+                &nbsp;&nbsp;
+                <v-text-field v-model="filterText" label="Filtro degli ordini"></v-text-field>
+            </v-layout>
         </v-toolbar>
         <v-list two-line>
-          <template v-for="(ordine, index) in ordini">
+          <template v-for="(ordine, index) in filteredOrdini">
             <v-list-tile :key="ordine.key" avatar ripple @click="toggle(index, ordine)">
               <v-list-tile-content>
                 <v-list-tile-title><strong>{{ ordine.numeroDocumento }} </strong> - {{ ordine.commessa }}</v-list-tile-title>
@@ -99,7 +113,8 @@ export default {
             indiciSelezionati: [],
             ordiniSelezionati: [],
             dialog: false,
-            dialogLoading: false
+            dialogLoading: false,
+            filterText: ""
         }
     },
     computed: {
@@ -111,6 +126,17 @@ export default {
         },
         ordini() {
             return this.$store.getters.getOrdini            
+        },
+        filteredOrdini() {
+            return this.ordini.filter(ordine => {
+                return (
+                    ordine.commessa.match(this.filterText) || 
+                    ordine.numeroDocumento.toString().match(this.filterText) ||
+                    ordine.ragioneSociale.match(this.filterText) ||
+                    ordine.utente.match(this.filterText) ||
+                    new Date(ordine.dataDocumento).toISOString().substring(0, 10).match(this.filterText)
+                )
+            })
         },
         allToggled() {
             return this.indiciSelezionati.length >= this.ordini.length
@@ -209,3 +235,9 @@ export default {
     }
 }
 </script>
+
+<style>
+.rounded{
+  border-radius:50px;
+}
+</style>
