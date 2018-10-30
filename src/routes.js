@@ -5,7 +5,7 @@ import Documento from './components/Documento'
 import Error from './components/Error'
 import Result from './components/Result'
 
-import store from './store'
+import store from './store/store'
 
 export const routes = [
     { path: '/login', component: Login },
