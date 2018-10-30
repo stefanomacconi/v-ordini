@@ -2,7 +2,8 @@
   <v-layout>
     <v-flex>
         <v-layout row wrap>
-                <v-flex xs6 class="grey lighten-3 rounded">
+                <v-flex xs6>
+                    <v-list dense class="grey lighten-3 rounded">
                     <v-list-tile avatar @click="goToDocumento()">
                         <v-list-tile-content class="text-xs-center">
                             <v-list-tile-title class="text-xs-center">TIPO DOCUMENTO</v-list-tile-title>
@@ -14,8 +15,10 @@
                             </v-list-tile-sub-title>
                         </v-list-tile-content>
                     </v-list-tile>
+                    </v-list>
                 </v-flex>
-                <v-flex xs6 class="grey lighten-3 rounded">
+                <v-flex xs6>
+                    <v-list dense class="grey lighten-3 rounded">
                     <v-list-tile avatar @click="goToConferma()">
                         <v-list-tile-content class="text-xs-center">
                             <v-list-tile-title class="text-xs-center">CONFERMA D'ORDINE</v-list-tile-title>
@@ -27,6 +30,7 @@
                             </v-list-tile-sub-title>
                         </v-list-tile-content>
                     </v-list-tile>
+                    </v-list>
                 </v-flex>
         </v-layout>
         <br>
@@ -170,11 +174,18 @@ export default {
             if (this.ordiniSelezionati.length == 0)
                 return
             this.dialogLoading = true
-            const ordineDaStampare = this.ordiniSelezionati[0]
+            var dataDaStampare = this.ordiniSelezionati
+            var path = '/ordine/stampa-multipla'
+            var pdfName = 'ordini_' + Date.now() + '.pdf'
+            if (this.ordiniSelezionati.length == 1) {
+                dataDaStampare = this.ordiniSelezionati[0]
+                path = '/ordine/stampa'
+                pdfName = 'ordine_' + dataDaStampare.key + '.pdf'
+            }
             axios({
                 method: 'post',
-                url: '/ordine/print',
-                data: ordineDaStampare, 
+                url: path,
+                data: dataDaStampare, 
                 responseType:'stream',
                 headers: {
                         'Content-Type': 'application/json'
@@ -183,7 +194,7 @@ export default {
                 const url = window.URL.createObjectURL(new Blob([res.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', 'ordine_' + ordineDaStampare.key + '.pdf');
+                link.setAttribute('download', pdfName);
                 document.body.appendChild(link);
                 link.click();
                 this.dialogLoading = false
